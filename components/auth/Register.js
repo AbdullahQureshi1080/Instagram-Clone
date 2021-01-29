@@ -6,13 +6,19 @@ const [name,setName]=useState("");
 const [email,setEmail]=useState("");
 const [password,setPassword]=useState("");
     const onSignUp =async ()=>{
+        const NAME = name.name;
         const EMAIL = email.email;
         const PASSWORD = password.password;
         try{
         console.log(EMAIL)
         console.log(PASSWORD)
         const result = await firebase.default.auth().createUserWithEmailAndPassword(EMAIL,PASSWORD);
+        const savedUser = await  firebase.default.firestore().collection("users").doc(firebase.default.auth().currentUser.uid).set({
+            name:NAME,
+            email:EMAIL,
+        })
         console.log(result);
+        console.log(savedUser);
     }catch(err){
         console.log("An Error Occured",err)
     }

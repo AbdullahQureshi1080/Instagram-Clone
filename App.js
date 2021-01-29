@@ -1,11 +1,24 @@
 import 'react-native-gesture-handler';
 import React,{useState,useEffect} from 'react';
 import {View,Text} from "react-native";
-// import { API_KEY, AUTH_DOMAIN} from 'react-native-dotenv'
+import {Provider }from 'react-redux';
+import {createStore, applyMiddleware} from "redux";
+import rootReducer from './store/reducers';
+import thunk from "redux-thunk"
 import * as firebase from 'firebase';
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-console.log(API_KEY)
+
+import { NavigationContainer } from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack'
+
+import LandingScreen from './components/auth/Landing';
+import RegisterScreen from './components/auth/Register';
+import LoginScreen from './components/auth/Login'; 
+import MainScreen from "./components/main";
+import AddScreen from "./components/main/Add";
+
+import { API_KEY,AUTH_DOMAIN,PROJECT_ID,STORAGE_BUCKET,MEASUREMENT_ID,MESSAGING_SENDER_ID,APP_ID } from './config/config';
+
 const firebaseConfig = {
   apiKey: API_KEY,
   authDomain: AUTH_DOMAIN,
@@ -15,35 +28,18 @@ const firebaseConfig = {
   appId: APP_ID,
   measurementId: MEASUREMENT_ID
 };
-if(firebase.apps.length === 0){
-  firebase.initializeApp(firebaseConfig)
+if(firebase.default.apps.length === 0){
+  firebase.default.initializeApp(firebaseConfig)
 }
 
-import { NavigationContainer } from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack'
-
-import LandingScreen from './components/auth/Landing';
-import RegisterScreen from './components/auth/Register';
-import LoginScreen from './components/auth/Login'; 
-import { API_KEY,AUTH_DOMAIN,PROJECT_ID,STORAGE_BUCKET,MEASUREMENT_ID,MESSAGING_SENDER_ID,APP_ID } from './config/config';
+const store = createStore(rootReducer,applyMiddleware(thunk));
 
 const Stack = createStackNavigator();
+
+
 export default function App() {
   const [loaded,setLoaded] = useState(false);
   const [loggedIn,setLoggedIn] = useState(false);
-
-// const onAuthHandler = async ()=>{
-//   const result = await firebase.default.auth().onAuthStateChanged((user)=>{
-//     if(!user){
-//       setLoggedIn(false);
-//       setLoaded(true);
-//     }
-//     else{
-//       setLoaded(true)
-//       setLoggedIn(true);
-//     }
-//   })
-// }
 
   useEffect(()=>{
      firebase.default.auth().onAuthStateChanged((user)=>{
@@ -67,19 +63,27 @@ export default function App() {
     }
 if(!loggedIn){
   return (
-    <NavigationContainer>
+
+      <NavigationContainer>
       <Stack.Navigator initialRouteName="Landing">
         <Stack.Screen name="Landing" component={LandingScreen} options={{headerShown:false}}/>
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+          {/* <Stack.Screen name="Login" component={LoginScreen} /> */}
       </Stack.Navigator>
     </NavigationContainer>
-  );
+
+   );
 }
 return(
-  <View style={{flex:1,justifyContent:"center"}}>
-    <Text>User is logged in</Text>
-  </View>
+  <Provider store={store}>   
+    <NavigationContainer>
+   <Stack.Navigator initialRouteName="Main">
+        <Stack.Screen name="Main" component={MainScreen} options={{headerShown:false}}/>
+        <Stack.Screen name="Add" component={AddScreen} />
+      </Stack.Navigator>
+      </NavigationContainer>
+  </Provider>
 );
 }
 
