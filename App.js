@@ -14,8 +14,9 @@ import {createStackNavigator} from '@react-navigation/stack'
 import LandingScreen from './components/auth/Landing';
 import RegisterScreen from './components/auth/Register';
 import LoginScreen from './components/auth/Login'; 
-import MainScreen from "./components/main";
+import MainScreen from "./components/Main";
 import AddScreen from "./components/main/Add";
+import SaveScreen from "./components/main/Save";
 
 import { API_KEY,AUTH_DOMAIN,PROJECT_ID,STORAGE_BUCKET,MEASUREMENT_ID,MESSAGING_SENDER_ID,APP_ID } from './config/config';
 
@@ -37,7 +38,7 @@ const store = createStore(rootReducer,applyMiddleware(thunk));
 const Stack = createStackNavigator();
 
 
-export default function App() {
+export default function App({navigation}) {
   const [loaded,setLoaded] = useState(false);
   const [loggedIn,setLoggedIn] = useState(false);
 
@@ -80,7 +81,8 @@ return(
     <NavigationContainer>
    <Stack.Navigator initialRouteName="Main">
         <Stack.Screen name="Main" component={MainScreen} options={{headerShown:false}}/>
-        <Stack.Screen name="Add" component={AddScreen} />
+        <Stack.Screen name="Add" component={AddScreen} navigation={navigation} />
+        <Stack.Screen name="Save" component={SaveScreen} />
       </Stack.Navigator>
       </NavigationContainer>
   </Provider>
