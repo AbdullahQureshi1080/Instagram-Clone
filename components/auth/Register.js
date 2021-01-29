@@ -6,11 +6,12 @@ const [name,setName]=useState("");
 const [email,setEmail]=useState("");
 const [password,setPassword]=useState("");
     const onSignUp =async ()=>{
-        console.log(email,password)
-        // let email = email;
-        // let password = password;
+        const EMAIL = email.email;
+        const PASSWORD = password.password;
         try{
-        const result = await firebase.auth().createUserWithEmailAndPassword(email,password);
+        console.log(EMAIL)
+        console.log(PASSWORD)
+        const result = await firebase.default.auth().createUserWithEmailAndPassword(EMAIL,PASSWORD);
         console.log(result);
     }catch(err){
         console.log("An Error Occured",err)
@@ -33,7 +34,7 @@ const [password,setPassword]=useState("");
             />
             <Button 
             title="Sign Up"
-            onPress={()=>onSignUp()}/>
+            onPress={onSignUp}/>
         </View>
     )
 }
