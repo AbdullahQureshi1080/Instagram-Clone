@@ -1,13 +1,15 @@
 import React, { useState,useEffect } from 'react'
-import { StyleSheet , View, Text,Image,FlatList } from 'react-native'
+import { StyleSheet , View, Text,Image,FlatList,Button} from 'react-native'
 import {useSelector} from "react-redux";
 
 import firebase from 'firebase';
 require("firebase/firestore");
 export default function Profile(props) {
     const state = useSelector(state => state);
+    const userFollowing = state.userState.following;
     const [userPosts, setUserPosts]=useState([])
     const [user, setUser]=useState(null)
+    const [following,setFollowing]=useState(false)
 
     
     useEffect(()=>{
@@ -44,7 +46,31 @@ export default function Profile(props) {
                 setUserPosts(posts);
           });
         }
-    },[props.route.params.uid])
+        if(userFollowing.indexOf(props.route.params.uid)>-1){
+            setFollowing(true);
+        }else{
+            setFollowing(false);
+        }
+    },[props.route.params.uid,userFollowing])
+
+const onFollow=()=>{
+    firebase.firestore()
+    .collection('following')
+    .doc(firebase.auth().currentUser.uid)
+    .collection("userFollowing")
+    .doc(props.route.params.uid)
+    .set({})
+}
+
+const onUnfollow=()=>{
+    firebase.firestore()
+    .collection('following')
+    .doc(firebase.auth().currentUser.uid)
+    .collection("userFollowing")
+    .doc(props.route.params.uid)
+    .delete()
+}
+
     if(user===null){
         return <View/>
     }
@@ -53,6 +79,17 @@ export default function Profile(props) {
             <View style={styles.infoContainer}>
             <Text>{user.name}</Text>
             <Text>{user.email}</Text>
+            {props.route.params.uid !== firebase.auth().currentUser.uid?(
+                <View>
+                    {following?
+                    (    
+                    <Button title="Following"onPress={()=>onUnfollow()}/>)
+                    :
+                    (
+                    <Button title="Follow"onPress={()=>onFollow()}/>
+                    )}
+                </View>
+            ) : null }
             </View>
            <View>
                <FlatList

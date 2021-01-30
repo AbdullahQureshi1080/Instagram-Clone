@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from 'react'
 import {View,Text} from "react-native";
 import {useDispatch,useSelector} from "react-redux";
-import {fetchUser, fetchUserPosts} from "../store/actions/index";
+import {fetchUser, fetchUserFollowing, fetchUserPosts} from "../store/actions/index";
 import {MaterialCommunityIcons} from 'react-native-vector-icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import firebase from 'firebase';
@@ -24,6 +24,7 @@ export default function main(props) {
     useEffect(()=>{
       dispatch(fetchUser());
       dispatch(fetchUserPosts());
+      dispatch(fetchUserFollowing());
     },[]);
     // console.log(state);
     if(user == undefined){
