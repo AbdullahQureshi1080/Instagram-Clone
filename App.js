@@ -30,7 +30,7 @@ const firebaseConfig = {
   measurementId: MEASUREMENT_ID
 };
 if(firebase.default.apps.length === 0){
-  firebase.default.initializeApp(firebaseConfig)
+ firebase.default.initializeApp(firebaseConfig)
 }
 
 const store = createStore(rootReducer,applyMiddleware(thunk));
@@ -82,7 +82,7 @@ return(
    <Stack.Navigator initialRouteName="Main">
         <Stack.Screen name="Main" component={MainScreen} options={{headerShown:false}}/>
         <Stack.Screen name="Add" component={AddScreen} navigation={navigation} />
-        <Stack.Screen name="Save" component={SaveScreen} />
+        <Stack.Screen name="Save" component={SaveScreen} navigation={navigation}/>
       </Stack.Navigator>
       </NavigationContainer>
   </Provider>
