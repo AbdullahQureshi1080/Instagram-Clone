@@ -71,6 +71,10 @@ const onUnfollow=()=>{
     .delete()
 }
 
+const onLogout = ()=>{
+    firebase.auth().signOut();
+}
+
     if(user===null){
         return <View/>
     }
@@ -89,7 +93,7 @@ const onUnfollow=()=>{
                     <Button title="Follow"onPress={()=>onFollow()}/>
                     )}
                 </View>
-            ) : null }
+            ) :    <Button title="Logout"onPress={()=>onLogout()}/>        }
             </View>
            <View>
                <FlatList
