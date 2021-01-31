@@ -17,6 +17,7 @@ import LoginScreen from './components/auth/Login';
 import MainScreen from "./components/Main";
 import AddScreen from "./components/main/Add";
 import SaveScreen from "./components/main/Save";
+import CommentScreen from "./components/main/Comment";
 
 import { API_KEY,AUTH_DOMAIN,PROJECT_ID,STORAGE_BUCKET,MEASUREMENT_ID,MESSAGING_SENDER_ID,APP_ID } from './config/config';
 
@@ -83,6 +84,7 @@ return(
         <Stack.Screen name="Main" component={MainScreen} navigation={navigation}/>
         <Stack.Screen name="Add" component={AddScreen} navigation={navigation} />
         <Stack.Screen name="Save" component={SaveScreen} navigation={navigation}/>
+        <Stack.Screen name="Comment" component={CommentScreen} navigation={navigation}/>
       </Stack.Navigator>
       </NavigationContainer>
   </Provider>

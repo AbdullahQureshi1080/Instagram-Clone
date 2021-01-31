@@ -4,49 +4,91 @@ import {useSelector} from "react-redux";
 
 import firebase from 'firebase';
 require("firebase/firestore");
+
 export default function Feed(props) {
     const state = useSelector(state => state);
-    const users = state.usersState.users;
+    console.log(state);
+    const currentUser= state.userState.currentUser;
     const following = state.userState.following;
-    const usersLoaded = state.usersState.usersLoaded;
-    const [posts, setPosts]=useState([])
-    // const [user, setUser]=useState(null)
-    // const [following,setFollowing]=useState(false)
+    const feed = state.usersState.feed;
+    const usersFollowingLoaded = state.usersState.usersFollowingLoaded;
 
-    
-    useEffect(()=>{
-        let posts =[];
-        if(usersLoaded == following.length ){
-            for(let i=0; i<following.length; i++){
-                const user = users.find(el => el.uid === following[i]);
-                if(user!= undefined){
-                    posts=[...posts,...user.posts]
-                }
-            }
-            posts.sort(function(x,y){
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        if (usersFollowingLoaded == following.length && following.length !== 0) {
+            feed.sort(function (x, y) {
                 return x.creation - y.creation;
             })
-            setPosts(posts);
+            setPosts(feed);
         }
-    },[usersLoaded])
+        // console.log(posts)
 
+    }, [usersFollowingLoaded, feed])
+
+    const onLikePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .set({})
+    }
+    const onDislikePress = (userId, postId) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(userId)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .delete()
+    }
     return (
         <View style={styles.container}>
-               <FlatList
-               numColumns={1}
-               horizontal={false}
-               data={posts}
-            //    key={}
-               renderItem={({item})=>(
-                   <View style={styles.containerImage}>
-                       <Text style={{flex:1,}}>{item.user.name}</Text>
-                       <Image style={styles.image}source={{uri:item.downloadURL}}/>
-                   </View>
-               )}
-               />
-           </View>
+            <View style={styles.containerGallery}>
+                <FlatList
+                    numColumns={1}
+                    horizontal={false}
+                    data={posts}
+                    renderItem={({ item }) => (
+                        <View
+                            style={styles.containerImage}>
+                            <Text style={styles.container}>{item.user.name}</Text>
+                            <Image
+                                style={styles.image}
+                                source={{ uri: item.downloadURL }}
+                            />
+                            { item.currentUserLike ?
+                                (
+                                    <Button
+                                        title="Dislike"
+                                        onPress={() => onDislikePress(item.user.uid, item.id)} />
+                                )
+                                :
+                                (
+                                    <Button
+                                        title="Like"
+                                        onPress={() => onLikePress(item.user.uid, item.id)} />
+                                )
+                            }
+                            <Text
+                                onPress={() => props.navigation.navigate('Comment', { postId: item.id, uid: item.user.uid })}>
+                                View Comments...
+                                </Text>
+                        </View>
+
+                    )}
+
+                />
+            </View>
+        </View>
+
     )
 }
+
 
 const styles = StyleSheet.create({
     container:{
@@ -67,3 +109,4 @@ const styles = StyleSheet.create({
         aspectRatio:1/1,
     }
 })
+

@@ -1,28 +1,28 @@
-import * as firebase from "firebase";
-import {USER_POSTS_STATE_CHANGE, USER_STATE_CHANGE,USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE, USERS_POSTS_STATE_CHANGE} from "../constants/index";
+import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
+import firebase from 'firebase'
+import { SnapshotViewIOSComponent } from 'react-native'
+require('firebase/firestore')
 
 
-export function clearData(){
-    return((dispatch)=>{
-        dispatch({
-            type:CLEAR_DATA,
-        })
+export function clearData() {
+    return ((dispatch) => {
+        dispatch({type: CLEAR_DATA})
     })
 }
-
-export function fetchUser(){
-    return((dispatch)=>{
-          firebase.default.firestore().collection("users").doc(firebase.default.auth().currentUser.uid).get().then((snapshot)=>{
-            if(snapshot.exists){
-                dispatch({
-                    type:USER_STATE_CHANGE,
-                    currentUser:snapshot.data()
-                })
-            }
-            else{
-                console.log("Does not exist");
-            }
-        });
+export function fetchUser() {
+    return ((dispatch) => {
+        firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.exists) {
+                    dispatch({ type: USER_STATE_CHANGE, currentUser: snapshot.data() })
+                }
+                else {
+                    console.log('does not exist')
+                }
+            })
     })
 }
 
@@ -44,6 +44,7 @@ export function fetchUserPosts() {
             })
     })
 }
+
 export function fetchUserFollowing() {
     return ((dispatch) => {
         firebase.firestore()
@@ -83,14 +84,15 @@ export function fetchUsersData(uid, getPosts) {
                     }
                 })
                 if(getPosts){
+                    
                     dispatch(fetchUsersFollowingPosts(uid));
                 }
         }
     })
 }
 
-
 export function fetchUsersFollowingPosts(uid) {
+    console.log(uid);
     return ((dispatch, getState) => {
         firebase.firestore()
             .collection("posts")
@@ -112,6 +114,28 @@ export function fetchUsersFollowingPosts(uid) {
                 }
                 dispatch({ type: USERS_POSTS_STATE_CHANGE, posts, uid })
 
+            })
+    })
+}
+
+export function fetchUsersFollowingLikes(uid, postId) {
+    return ((dispatch, getState) => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(uid)
+            .collection("userPosts")
+            .doc(postId)
+            .collection("likes")
+            .doc(firebase.auth().currentUser.uid)
+            .onSnapshot((snapshot) => {
+                const postId = snapshot.ZE.path.segments[3];
+
+                let currentUserLike = false;
+                if(snapshot.exists){
+                    currentUserLike = true;
+                }
+
+                dispatch({ type: USERS_LIKES_STATE_CHANGE, postId, currentUserLike })
             })
     })
 }
